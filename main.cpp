@@ -180,10 +180,26 @@ int main(void) {
 
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
+			 PARSE(&synSTATO);
+			 if(synSTATO.valid == VALIDO){
+				 /// invia la lettura
+				 for(int i = 0; i < 4; i++){
+					 /// invio dei 4 byte dell'intero little endian
+					 volatile uint8_t valore;
+					 valore = (ENC0.pos >> (8 * i)) & 0xff;
+					 PRINTF ("%d", valore);
+					 valore = (ENC0.posV[i] >> (8 * i)) & 0xff;
+					 PRINTF ("%d", valore);
+					 valore = (ENC0.posV[i + 8] >> (8 * i)) & 0xff;
+					 PRINTF ("%d", valore);
+				 }
 
+				 synSTATO.valid == NON_VALIDO;
+			 }
 			 /// aggiorna il buffer
 			 READ_PTR1++;
 			 READ_PTR1 &= DIM_READ_BUFF - 1;
+
 		}
 
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti

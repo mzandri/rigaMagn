@@ -61,6 +61,7 @@ public:
 extern "C" {
 #endif
 
+void PARSE(syn_stat *STATO);
 void parse(syn_stat *,  comando *, syntaxStatus *);
 void convertToToken(syn_stat *, comando * );
 /// reset dell'automa (o inizializzazione)

@@ -256,7 +256,8 @@ void IntEnc0(void){
 /// interruzione che scatta alla ricezione di IDX
 void IntGPIOf(void){
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
-	ENC0.posV[ENC0.indice++] = QEIPositionGet(QEI0_BASE);
+	ENC0.pos = QEIPositionGet(QEI0_BASE);
+	ENC0.posV[ENC0.indice++] = ENC0.pos;
 	ENC0.indice &= 63;
 	if (QEIDirectionGet(QEI0_BASE) == 1)
 		ENC0.contIDX++;

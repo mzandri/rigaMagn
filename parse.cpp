@@ -33,6 +33,69 @@ void resetAutoma(syn_stat * STATO){
 ///
 /// analizza il comando che e' arrivato
 ///
+void PARSE(syn_stat *STATO){
+
+
+	STATO->cmd[STATO->ST] = uart1buffer[READ_PTR1];
+
+	/// La ricezione di un comando errato non produce il cambio di stato del mezzo.
+	/// Infatti STATO->valid cambia a seguito di un comando corretto in questa funzione ma NON a seguito di un comando errato
+	/// Lo stato può quindi diventare NON_VALIDO solo a seguito di time out o perche' gia' lo era.
+	switch(STATO->ST){
+	case 0:
+		STATO->check = 0;
+		if (STATO->cmd[0] >64 && STATO->cmd[0] < 91 ){
+			/// una lettera MAIUSCOLA e quindi un comando di azione da raspberry
+			STATO->l_cmd = 4;
+			if (STATO->cmd[STATO->ST] == 'd'){
+				resetAutoma(STATO);
+				STATO->valid = VALIDO;
+			}
+			STATO->ST = 0;
+			STATO->check = STATO->cmd[0];
+		}
+		/*else if(STATO->cmd[0] <= 16){
+			/// comando di richiesta dati lungo due caratteri
+			STATO->l_cmd = 2;
+			STATO->ST = 1;
+		}*/
+	break;
+
+	case 1:
+
+		STATO->check ^= STATO->cmd[1];
+		STATO->ST = 2;
+
+	break;
+
+	case 2:
+		STATO->check ^= CHECK_SUM;
+		if(STATO->check == STATO->cmd[2]){
+			/// ok, il messaggio e' valido
+			//convertToToken(STATO, cmdPtr);
+			/// il comando e' ora valido
+			STATO->valid = VALIDO;
+			STATO->ST = 3;
+		}
+		else
+			STATO->ST = 0;
+
+	break;
+
+	case 3:
+		// resetta l'automa e rimette lo stato a NON_VALIDO
+		/// l'invio del comando e' fatto di 4 bytes e quindi passa di qui quando e' arrivato il IV byte cioe' quello
+		/// del terminatore
+		resetAutoma(STATO);
+	break;
+
+	}
+}
+
+
+///
+/// analizza il comando che e' arrivato
+///
 void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 
 
@@ -61,17 +124,7 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 
 		STATO->check ^= STATO->cmd[1];
 		STATO->ST = 2;
-		/// si analizza il checksum e poi si esegue il comando
-		/*if (STATO->cmd[0] ^ CHECK_SUM == STATO->cmd[1]){
-			// ok
-			convertToToken(STATO);
-			// resetta l'automa
-			resetAutoma(STATO);
-				if(STATO->token != ERRORE)
-			/// il comando e' ora valido
-			STATO->valid = VALIDO;
-		}
-*/
+
 	break;
 
 	case 2:
