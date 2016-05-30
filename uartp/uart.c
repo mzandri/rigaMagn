@@ -62,6 +62,9 @@ void ConfigureUART(uint32_t baud, int numUart){
 		// Initialize the UART for console I/O.
 		//
 		UARTStdioConfig(numUart, baud, UART_CLK);
+		/// per questo test non abilitiamo le interruzioni
+		ROM_IntEnable(INT_UART0); //enable the UART interrupt
+		ROM_UARTIntEnable(UART0_BASE, UART_INT_RX ); //only enable RX and TX interrupts
 	}
 	else{
 		//
@@ -92,7 +95,7 @@ void ConfigureUART(uint32_t baud, int numUart){
 		UARTStdioConfig(1, baud, UART_CLK);
 		/// per questo test non abilitiamo le interruzioni
 		ROM_IntEnable(INT_UART1); //enable the UART interrupt
-		ROM_UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT); //only enable RX and TX interrupts
+		ROM_UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_TX); //only enable RX and TX interrupts
 	}
 }
 

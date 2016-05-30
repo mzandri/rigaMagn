@@ -167,8 +167,8 @@ int main(void) {
 	///      TASK PRINCIPALE
 	///
 	/////////////////////////////////////////////////////////
-	setupUART(1);
-	XB.sendString("Ciao\n", 5);
+//	setupUART(1);
+//	XB.sendString("Ciao\n", 5);
 	PRINTF("Telemetria\n");
 	while(1){
 
@@ -177,6 +177,8 @@ int main(void) {
 /*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
 /************************************************************/
 
+
+		uint8_t valore_carattere = UARTCharGet(UART0_BASE);
 
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
@@ -188,13 +190,27 @@ int main(void) {
 					 volatile uint8_t valore;
 					 valore = (ENC0.pos >> (8 * i)) & 0xff;
 					 PRINTF ("%d", valore);
+				 }
+				 /// spaziatura
+				 PRINTF("\n");
+				 for(int i = 0; i < 4; i++){
+					 /// invio dei 4 byte dell'intero little endian
+					 volatile uint8_t valore;
 					 valore = (ENC0.posV[i] >> (8 * i)) & 0xff;
 					 PRINTF ("%d", valore);
-					 valore = (ENC0.posV[i + 8] >> (8 * i)) & 0xff;
-					 PRINTF ("%d", valore);
 				 }
+				 /// spaziatura
+				 PRINTF("\n");
+				 for(int i = 0; i < 4; i++){
+					 /// invio dei 4 byte dell'intero little endian
+					 volatile uint8_t valore;
+					 valore = (ENC0.posV[i + 8] >> (8 * i)) & 0xff;
+ 					 PRINTF ("%d", valore);
+				 }
+				 /// spaziatura
+				 PRINTF("\n");
 
-				 synSTATO.valid == NON_VALIDO;
+				 synSTATO.valid = NON_VALIDO;
 			 }
 			 /// aggiorna il buffer
 			 READ_PTR1++;

@@ -43,8 +43,8 @@ void UnlockPD7_01()
 encQuad::encQuad() {
 	// TODO Auto-generated constructor stub
 	address 	= 0;
-	/// DA CONTROLLARE SE 80000 VA BENE
-	fscala 		= 800000;
+
+	fscala 		= 40000;
 	zero_pos 	= 0;
 	vel_period = ROM_SysCtlClockGet()/10;
 	vel = 0;
@@ -257,6 +257,10 @@ void IntEnc0(void){
 void IntGPIOf(void){
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
 	ENC0.pos = QEIPositionGet(QEI0_BASE);
+	if (ENC0.pos > ENC0.fscala / 2){
+		/// posizione negativa
+		ENC0.pos -= ENC0.fscala / 2;
+	}
 	ENC0.posV[ENC0.indice++] = ENC0.pos;
 	ENC0.indice &= 63;
 	if (QEIDirectionGet(QEI0_BASE) == 1)
