@@ -266,7 +266,7 @@ void setupUART(int num){
 void PRINT_WELCOME(void){
 	int i, valore;
 	for(i = 0; i < 10000; i++);
-	PRINTF("Modulo robotico\n");
+	PRINTF("Modulo riga magnetica\n");
 	for(i = 0; i < 10000; i++);
 	PRINTF("Lettura dal clock\n");
 	valore = ROM_SysCtlClockGet();

@@ -73,6 +73,9 @@ int main(void) {
 	/// imposta gli indirizzi dei due moduli
 	ENC0.setAddr(QEI0_BASE);
 	ENC1.setAddr(QEI1_BASE);
+	/// inizializzati i moduli encoder
+	ENC0.qeiInit();
+	ENC1.qeiInit();
 
 	/// descrittore della sintassi dei comandi
 	syn_stat synSTATO;
@@ -85,11 +88,6 @@ int main(void) {
 	DI();
 
 	comando CMD1;
-	//DATA.distPtr = &DIST;
-	//passaggio degli indirizzi delle strutture alla struttura generale
-	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
-	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	//datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -115,40 +113,15 @@ int main(void) {
 	//initTimer1(100);
 	/// inizializza il contatore della persistenza del comando
 	synSTATO.tick = 0;
-
-
+	resetAutoma(&synSTATO);
 	PRINTF("inizializzato automa comandi\n");
-	/// inizializzati i moduli encoder
-	ENC0.qeiInit();
-	ENC1.qeiInit();
-	//servo = (pwm *) &pwmServi;
 
 	/// abilita le interruzioni
 	EI();
 	PRINTF("abilitate interruzioni\n");
 
-
-//
-//	pwm_power(&PWM);
 	contatore = 0;
 
-	//// inizializza l'accelrometro
-	//stato =  writeI2CByte(CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
-	// scrivo nel registro 0x20 il valore 0x0F, cioe' banda minima, modulo on e assi on
-	/// sintassi: indirizzo slave, num parm, indirizzo reg, valore da scrivere
-	//I2CSend(ACCEL_ADDR, 2, CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
-//	A.isPresent = testAccel();
-//	if (A.isPresent)
-//		impostaAccel(&A);
-//
-//	/// taratura sul sensore di luminosita'
-//	whiteBal(&COL);
-//	/// taratura del sensore di temepratura
-//	taraturaTemp(&TEMP);
-//
-//	///
-	//qei_test(&QEI);
-	/// task principale
 	int tempCont = 0;
 
 	XB.test();
@@ -182,6 +155,7 @@ int main(void) {
 				 }
 				 /// spaziatura
 				 PRINTF("\n");
+				 PRINTF("%d\t%d(%d)\n", ENC0.posFix, ENC0.contIDX, ENC0.posIDX);
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
 					 volatile uint8_t valore;
@@ -237,7 +211,7 @@ int main(void) {
 
 
 			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 			ENC0.readPos();
 			ENC0.readDir();
 			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);

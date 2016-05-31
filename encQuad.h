@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define		TRUE	1
+#define		FALSE	0
 
 class encQuad {
 public:
@@ -30,6 +32,7 @@ public:
 	/// prorpieta'
 	int 		vel;
 	int 		dir;
+	int 		posIDX;
 	/// posizione aggiornata dalla routine di interruzione
 	int 		pos;
 	/// posiizone fissata per la trasmissione
@@ -43,7 +46,7 @@ public:
 	int 		posV[64];
 	int			indice;
 	int			contIDX;
-
+	int			setIDX;
 };
 
 #endif /* ENCQUAD_H_ */

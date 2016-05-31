@@ -50,6 +50,7 @@ encQuad::encQuad() {
 	indice 		= 0;
 	contIDX 	= 0;
 	posFix 		= 0;
+	setIDX		= FALSE;
 
 }
 
@@ -163,6 +164,10 @@ void encQuad::qeiInit(){
 void encQuad::readPos(){
 	float tmp, k = 1.0;
 	pos = QEIPositionGet(address);
+	if (pos > fscala / 2){
+		/// posizione negativa
+		pos -= fscala;
+	}
 	tmp = pos * k;
 	dist_mm = (int) tmp;
 
@@ -212,10 +217,16 @@ void IntGPIOf(void){
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
 	/// scrive la posizione raggiunta dal lettore
 	ENC0.pos = QEIPositionGet(QEI0_BASE);
+	/// serve ad indicare lo zero nel punto di parteza
 	if (ENC0.pos > ENC0.fscala / 2){
 		/// posizione negativa
-		ENC0.pos -= ENC0.fscala / 2;
+		ENC0.pos -= ENC0.fscala;
 	}
+	if (ENC0.setIDX == FALSE){
+		ENC0.setIDX = TRUE;
+		ENC0.posIDX = ENC0.pos;
+	}
+
 	ENC0.posV[ENC0.indice++] = ENC0.pos;
 	ENC0.indice &= 63;
 	if (QEIDirectionGet(QEI0_BASE) == 1)
