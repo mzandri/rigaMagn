@@ -26,6 +26,7 @@
 ///
 /// routine di servizio della uart1 (usata per comunicare con la tiva)
 volatile uint8_t uart1buffer[], RX_PTR1 = 0, READ_PTR1 = 0;
+volatile uint8_t uart0buffer[64], RX_PTR0 = 0, READ_PTR0 = 0;
 
 void UART1IntHandler(void)
 {
@@ -52,6 +53,38 @@ void UART1IntHandler(void)
     	//ROM_UARTCharPutNonBlocking(UART0_BASE, uart1buffer[RX_PTR1]);
     	RX_PTR1++;
     	RX_PTR1 &= DIM_READ_BUFF - 1;
+        //UARTCharPutNonBlocking(UART1_BASE,
+        //		dato);
+    }
+}
+
+///
+/// ISR seriale 0
+void UART0IntHandler(void)
+{
+    uint32_t 	ui32Status;
+    //
+    // Get the interrrupt status.
+    //
+    ui32Status = ROM_UARTIntStatus(UART0_BASE, true);
+
+    //
+    // Clear the asserted interrupts.
+    //
+    ROM_UARTIntClear(UART0_BASE, ui32Status);
+    //PRINTF("INT:\n");
+    //
+    // Loop while there are characters in the receive FIFO.
+    //
+    while(ROM_UARTCharsAvail(UART0_BASE)){
+        //
+        // Read the next character from the UART and write it back to the UART.
+        //
+    	uart0buffer[RX_PTR0] = ROM_UARTCharGetNonBlocking(UART0_BASE);
+    	/// echo
+    	//ROM_UARTCharPutNonBlocking(UART0_BASE, uart1buffer[RX_PTR1]);
+    	RX_PTR0++;
+    	RX_PTR0 &= DIM_READ_BUFF - 1;
         //UARTCharPutNonBlocking(UART1_BASE,
         //		dato);
     }

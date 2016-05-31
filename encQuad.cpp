@@ -43,13 +43,13 @@ void UnlockPD7_01()
 encQuad::encQuad() {
 	// TODO Auto-generated constructor stub
 	address 	= 0;
-
 	fscala 		= 40000;
 	zero_pos 	= 0;
 	vel_period = ROM_SysCtlClockGet()/10;
-	vel = 0;
-	indice = 0;
-	contIDX = 0;
+	vel 		= 0;
+	indice 		= 0;
+	contIDX 	= 0;
+	posFix 		= 0;
 
 }
 
@@ -126,52 +126,6 @@ void encQuad::qeiInit(){
 			GPIOPinTypeQEI(GPIO_PORTC_BASE, GPIO_PIN_5 | GPIO_PIN_6);
 		break;
 		}
-
-		//    // Write this 'key' 0x4C4F434B into Port D's Lock register to enable access to Port D's Commit register
-		//
-		//    //HWREG(GPIO_0_LOCK) |= GPIO_LOCK_KEY;
-		//    GPIO_O_LOCK = GPIO_LOCK_KEY;
-		//
-		//    // Flip only bit 7 ON to ALLOW Port D bit 7 to be switched from NMI use to QEI use
-		//    GPIO_O_CR |= 0x80;
-		//
-		//
-		//    // Switch pin usage
-		//    GPIO_O_AFSEL |= 0x80;            // Selects alternative usage for the pin
-		//    //GPIO_PORTD_PCTL_R  |= 0x60000000;    // Selects QEI0 PHB0 in particular (pages 722 & 1405 in LM4F232H5QD manual)
-		//    GPIO_O_PCTL |= 0x60000000;
-		//
-		//    // Flip only bit 7 OFF to Re-lock
-		//    GPIO_O_CR &= !0x08;
-
-		//
-		//! Configures the quadrature encoder.
-		//!
-		//! \param ui32Base is the base address of the quadrature encoder module.
-		//! \param ui32Config is the configuration for the quadrature encoder.  See
-		//! below for a description of this parameter.
-		//! \param ui32MaxPosition specifies the maximum position value.
-		//!
-		//! This function configures the operation of the quadrature encoder.  The
-		//! \e ui32Config parameter provides the configuration of the encoder and is
-		//! the logical OR of several values:
-		//!
-		//! - \b QEI_CONFIG_CAPTURE_A or \b QEI_CONFIG_CAPTURE_A_B specify if edges
-		//!   on channel A or on both channels A and B should be counted by the
-		//!   position integrator and velocity accumulator.
-		//! - \b QEI_CONFIG_NO_RESET or \b QEI_CONFIG_RESET_IDX specify if the
-		//!   position integrator should be reset when the index pulse is detected.
-		//! - \b QEI_CONFIG_QUADRATURE or \b QEI_CONFIG_CLOCK_DIR specify if
-		//!   quadrature signals are being provided on ChA and ChB, or if a direction
-		//!   signal and a clock are being provided instead.
-		//! - \b QEI_CONFIG_NO_SWAP or \b QEI_CONFIG_SWAP to specify if the signals
-		//!   provided on ChA and ChB should be swapped before being processed.
-		//!
-		//! \e ui32MaxPosition is the maximum value of the position integrator and is
-		//! the value used to reset the position capture when in index reset mode and
-		//! moving in the reverse (negative) direction.
-		//!
-		//! \return None.
 
 		//configurazione qei
 		QEIConfigure(address,(QEI_CONFIG_CAPTURE_A | QEI_CONFIG_RESET_IDX | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), fscala);
@@ -256,6 +210,7 @@ void IntEnc0(void){
 /// interruzione che scatta alla ricezione di IDX
 void IntGPIOf(void){
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
+	/// scrive la posizione raggiunta dal lettore
 	ENC0.pos = QEIPositionGet(QEI0_BASE);
 	if (ENC0.pos > ENC0.fscala / 2){
 		/// posizione negativa

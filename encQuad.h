@@ -25,11 +25,15 @@ public:
 	void setAddr(uint32_t add){address = add;}
 	void update();
 	void intIDXEnable();
+	void fixPos(){ posFix = pos; }
 
 	/// prorpieta'
 	int 		vel;
 	int 		dir;
+	/// posizione aggiornata dalla routine di interruzione
 	int 		pos;
+	/// posiizone fissata per la trasmissione
+	int 		posFix;
 	int 		vel_period;
 	int 		fscala;
 	int 		zero_pos;

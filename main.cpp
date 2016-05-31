@@ -36,31 +36,22 @@
 #include "driverlib/uart.h"
 #include "driverlib/rom.h"
 #include "uartp/uartstdio.h"
-
 #include "gyro_init.h"
-
 #include "gen_def.h"
-
 #include "uartp/uart.h"
 #include "init.h"
-
-
 #include "xbee/xbee.h"
-
 #include "qei.h"
-
 #include "parse.h"
 #include "encQuad.h"
-
-
-
 
 /// variabili globali
 volatile int procCom = 0, tick10, tick100, millis10 = 0;
 volatile int procCom4 = 0;
 volatile int ADCDataReadyFlag = 0;
 /// buffer per la seriale che riceve i dati dalla raspPi
-extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
+extern volatile uint8_t uart1buffer[DIM_READ_BUFF], RX_PTR1, READ_PTR1;
+extern volatile uint8_t uart0buffer[DIM_READ_BUFF], RX_PTR0, READ_PTR0;
 
 /// MODULI ENCODER ///
 encQuad ENC0, ENC1;
@@ -177,18 +168,16 @@ int main(void) {
 /*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
 /************************************************************/
 
-
-		uint8_t valore_carattere = UARTCharGet(UART0_BASE);
-
-		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
-		if (READ_PTR1 != RX_PTR1){
+		// controllo di messaggio sulla seriale 0 (ricevuto comando pc
+		if (READ_PTR0 != RX_PTR0){
 			 PARSE(&synSTATO);
 			 if(synSTATO.valid == VALIDO){
+				 ENC0.fixPos();
 				 /// invia la lettura
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
 					 volatile uint8_t valore;
-					 valore = (ENC0.pos >> (8 * i)) & 0xff;
+					 valore = (ENC0.posFix >> (8 * i)) & 0xff;
 					 PRINTF ("%d", valore);
 				 }
 				 /// spaziatura
@@ -213,17 +202,11 @@ int main(void) {
 				 synSTATO.valid = NON_VALIDO;
 			 }
 			 /// aggiorna il buffer
-			 READ_PTR1++;
-			 READ_PTR1 &= DIM_READ_BUFF - 1;
+			 READ_PTR0++;
+			 READ_PTR0 &= DIM_READ_BUFF - 1;
 
 		}
 
-		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
-//		if(pidPtr->rispondi == TRUE){
-//			rispostaRotazione(pidPtr, &synSTATO);
-//			pidPtr->rispondi = FALSE;
-//		}
-//
 		/*********************/
 		/* AZIONI CADENZATE  */
 		/*********************/
@@ -237,9 +220,6 @@ int main(void) {
 			contatore++;
 			millis10++;
 
-
-
-			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente
 		/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
@@ -248,9 +228,7 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 100ms ///
 		if (tick10 >= 10){
 			tick10 = 0;
-			ENC0.readPos();
-			ENC0.readDir();
-			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
+
 		}
 		/* misura gli encoder e calcola spostamenti e velocità */
 		//////////////////////////////////
@@ -259,94 +237,14 @@ int main(void) {
 
 
 			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-
-
-			////
-			//// VIENE ESEGUITA QUANDO IL COMANDO E' RILASCIO KIT (comando 'P' da raspberry)
-			///  E QUANDO il COMANDO e' SULLO STATO AVVIA. RILASCIATO IL PACK il COMANDO
-			///  PONE avvia = false e NON lo RIESEGUIRA' più finché token sarà di nuovo
-			///  RILASCIO_PACK e CMD con avvia = true. QUESTO ACCADE IN convertToToken,
-			///  nel file parse.cpp
 #ifdef _DEBUG_
-			if (CMD1.avvia == true && synSTATO.token == RILASCIO_PACK){
-				/// rilascio del kit
-
-				CMD1.avvia = false;
-				CMD1.isRun = false;
-			}
-#endif
-
-			/// MISURA IL SENSORE DI ACCELERAZIONE
-
-/// stampe dei valori dei sensori di distanza.
-#ifdef _DEBUG_
-			for(int i = 0; i < 5; i++){
-
-
-			}
-			PRINTF("\n");
-//
-#endif
-//				/// converte la misure grezza in mm
-
-#ifndef _DEBUG_
-//				/// ricopia nella struttare DIST:
-			for(int attesa = 0; attesa < 5; attesa++){
-//					if (attesa == 3)
-//						continue;
-				PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-			}
-#endif
-
-#ifndef _DEBUG_
-
-			contatore = 0;
-			PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-			printFloat(Rot.yawF, 4);
-			PRINTF("\t");
-			printFloat(Rot.yawF0, 4);
-//					if (A.isPresent == true){
-//						PRINTF("\t");
-//						A.misuraAccelerazioni();
-//					}
-			PRINTF("\n");
-
-#endif
-
+			ENC0.readPos();
+			ENC0.readDir();
+			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
+#endif //_DEBUG_
 			//// reset del contatore
 			tick100 = 0;
 		}
-
-
-
-			/*if(G.IsPresent == OK)
-				if( contatore == 1){
-					/// ogni 10 ms effettua il calcolo del PID
-					contatore = 0;
-					HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
-					PID(&G, pidPtr, &PWM, &CIN);
-					setXPWM(&CTRL[1], &PWM);
-					procCom = 0;
-					HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
-					blink++;
-					/// lampeggio del led con periodo di 2 s.
-					if (blink >= 100){
-						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + ((GPIO_PIN_2 | GPIO_PIN_1) << 2))) = 0;
-						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^= GPIO_PIN_3;
-						blink = 0;
-					}
-				///provvede ad integrare la misura della velcita' angolare ogni 10 ms
-				//misuraAngoli(&G);
-				//PRINTF("asse x: %d\t", G.pitch);
-				//PRINTF("\tasse y: %d\t", G.roll);
-				//PRINTF("\tasse z: %d\n", G.yaw);
-				//PRINTF("uscita PID: %d\n", C.uscita);
-			}*/
-
-			/* RISPOSTA AL COMANDO */
-			//inviaSensore(&synSTATO, &DATA);
-
-		//}
 	}
 }
 
