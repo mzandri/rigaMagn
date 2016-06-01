@@ -9,34 +9,28 @@
 #define PARSE_H_
 
 #include <stdint.h>
-#include "pid.h"
 
-#include "sens_col_ir/sens.h"
-#include "qei.h"
 #include "distMis.h"
-#include "sens_col_ir/sens1.h"
-
-#include "Giroscopio.h"
 #include "encQuad.h"
 
 
-typedef struct _glb{
-	//gyro 		*gPtr;
-	TEMPER			*temperat;
-	temperatura 	*tempPtr;
-	colore 			*colPtr;
-	COLORE			*colorClass;
-	//distanza 	*distPtr;
-	//cinematica 		*cinPtr;
-	qei 			*qeiPtr;
-	survivor 		*surPtr;
-
-	/* classe */
-	distMis 		*DSTptr;
-	Giroscopio  	*gyro;
-	encQuad			*encoder;
-	//accelerometro 	*acc;
-} glb;
+//typedef struct _glb{
+//	//gyro 		*gPtr;
+//	TEMPER			*temperat;
+//	temperatura 	*tempPtr;
+//	colore 			*colPtr;
+//	COLORE			*colorClass;
+//	//distanza 	*distPtr;
+//	//cinematica 		*cinPtr;
+//	qei 			*qeiPtr;
+//	survivor 		*surPtr;
+//
+//	/* classe */
+//	distMis 		*DSTptr;
+//	Giroscopio  	*gyro;
+//	encQuad			*encoder;
+//	//accelerometro 	*acc;
+//} glb;
 
 class syntaxStatus{
 public:
@@ -75,14 +69,5 @@ void sendReply(syn_stat *, uint8_t numChar);
 }
 #endif
 
-void rispondiComando(syn_stat *sSTAT, glb *);
-/// invia la lettura di un sensore
-void inviaSensore(syn_stat *,  glb*);
-
-//void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-//void datiRaccolti(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
-
-//pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
-void EseguiPID(syn_stat *sSTAT, ControlloPID *);
 
 #endif /* PARSE_H_ */

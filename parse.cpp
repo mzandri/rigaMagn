@@ -12,7 +12,7 @@
 #include "inc/hw_memmap.h"
 #include "driverlib/uart.h"
 #include "init.h"
-#include "pid.h"
+//#include "pid.h"
 
 #include "sens_col_ir/sens.h"
 #include "distMis.h"

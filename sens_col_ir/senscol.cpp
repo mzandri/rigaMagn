@@ -21,28 +21,6 @@ extern volatile int contLightPwm;
 extern volatile int procCom4;
 
 ///
-/// normalizza i colori sencondo norma 2
-void normalizzaColori(colore *colPtr){
-
-	float v[3], n = 0.0;
-	int i;
-
-	v[0] = (float) colPtr->rosso;
-	v[1] = (float) colPtr->verde;
-	v[2] = (float) colPtr->blu;
-
-	for ( i = 0; i < 3; i++)
-		n += v[i] * v[i];
-	n = sqrt(n);
-
-	/// normalizzazione dei colori
-	colPtr->rosso /= n;
-	colPtr->verde /= n;
-	colPtr->blu   /= n;
-}
-
-
-///
 /// taratura del sensore
 
 int readCol(void){
@@ -70,44 +48,6 @@ int readCol(void){
 	/// ha termitato la finestra ed il dato e' pronto.
 	colPtr->bianco = contaImpulsi;*/
 }
-
-
-///
-/// taratura in un punto noto della temepratura
-//void taraturaTemp(temperatura *tempPtr){
-//	/// taratura del sensore
-//	uint8_t buff[8];
-//	uint32_t i;
-//	uint16_t valore;
-//	float temp;
-//	/// temperatura rilevata dal case
-//	I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
-//	valore = (buff[1] << 8) + buff[0];
-//	temp = (float)valore * 0.02 - 273.15;
-//	tempPtr->Tcase = valore;
-//	/// breve attesa
-//	for (i=0; i < 1000; i++);
-//	/// temp rilevata dal sensore
-//	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
-//	valore = (buff[1] << 8) + buff[0];
-//	temp = (float)valore * 0.02 - 273.15;
-//	tempPtr->T_tar = temp;
-//	tempPtr->tempRaw = valore;
-//	tempPtr->ok = 1;
-//}
-
-///
-/// lettura della temperatura
-//void readTemp(temperatura *tempPtr){
-//
-//	unsigned char buffer[4];
-//	//char valore;
-//	/// per leggere la temperatura deve chiamare il sensore su I2C
-//	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
-//	tempPtr->tempRaw = (buffer[1] << 8) + buffer[0];
-//	tempPtr->Temp = 0.02 * tempPtr->tempRaw  + 273.15;
-//	tempPtr->ok = 0;
-//}
 
 
 
@@ -197,77 +137,77 @@ void initTimer4(uint8_t ms){
     //ROM_TimerIntEnable(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
 }
 
-///
-/// legge il sensore tramite metodo della classe
-float TEMPER::readTemp(){
-
-	unsigned char buffer[4];
-	if (i2cPtr == NULL){
-		PRINTF("registrare il canale I2c per il pirometro\n");
-		return -300.0;
-	}
-	//char valore;
-	/// per leggere la temperatura deve chiamare il sensore su I2C
-	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3, buffer);
-	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
-	tempRaw = (buffer[1] << 8) + buffer[0];
-	Temp = 0.02 * tempRaw  - 273.15;
-	Tint = (int)Temp;
-	ok = 0;
-	return Temp;
-}
-
-///
-/// taratura del sensore di temperatura
-void TEMPER::taraturaTemp(){
-  	/// taratura del sensore
-	uint8_t buff[8];
-	uint32_t i;
-	uint16_t valore;
-	float temp;
-	if (i2cPtr == NULL){
-		PRINTF("registrare il canale I2c per il pirometro\n");
-		return;
-	}
-	/// temperatura rilevata dal case
-	i2cPtr->I2CGetN(0x06 | 0x20, 3 , buff);
-	//I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
-	valore = (buff[1] << 8) + buff[0];
-	temp = (float)valore * 0.02 - 273.15;
-	Tcase = valore;
-	/// breve attesa
-	for (i=0; i < 1000; i++);
-	/// temp rilevata dal sensore
-	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3 , buff);
-	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
-	valore = (buff[1] << 8) + buff[0];
-	temp = (float)valore * 0.02 - 273.15;
-	T_tar = temp;
-	tempRaw = valore;
-	ok = 1;
-}
-
-/// collega la porta I2C
-void TEMPER::attachI2C(I2C * p, uint8_t sa){
-	i2cPtr = p;
-	i2cPtr->I2CSetSlave_Add(sa);
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-
-
-COLORE::COLORE(){
-	 luminanza = 0; bianco = 0; piastra.isDark = ISNT_DARK;
-}
-
-void COLORE::Run(){
-	uint32_t lum = read();
-	/// imposta la proprieta' luminanza
-	set(lum);
-	if(lum < getWhite() / 4){
-		piastra.isDark = IS_DARK;
-	}
-	else
-		piastra.isDark = ISNT_DARK;
-}
+/////
+///// legge il sensore tramite metodo della classe
+//float TEMPER::readTemp(){
+//
+//	unsigned char buffer[4];
+//	if (i2cPtr == NULL){
+//		PRINTF("registrare il canale I2c per il pirometro\n");
+//		return -300.0;
+//	}
+//	//char valore;
+//	/// per leggere la temperatura deve chiamare il sensore su I2C
+//	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3, buffer);
+//	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
+//	tempRaw = (buffer[1] << 8) + buffer[0];
+//	Temp = 0.02 * tempRaw  - 273.15;
+//	Tint = (int)Temp;
+//	ok = 0;
+//	return Temp;
+//}
+//
+/////
+///// taratura del sensore di temperatura
+//void TEMPER::taraturaTemp(){
+//  	/// taratura del sensore
+//	uint8_t buff[8];
+//	uint32_t i;
+//	uint16_t valore;
+//	float temp;
+//	if (i2cPtr == NULL){
+//		PRINTF("registrare il canale I2c per il pirometro\n");
+//		return;
+//	}
+//	/// temperatura rilevata dal case
+//	i2cPtr->I2CGetN(0x06 | 0x20, 3 , buff);
+//	//I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
+//	valore = (buff[1] << 8) + buff[0];
+//	temp = (float)valore * 0.02 - 273.15;
+//	Tcase = valore;
+//	/// breve attesa
+//	for (i=0; i < 1000; i++);
+//	/// temp rilevata dal sensore
+//	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3 , buff);
+//	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
+//	valore = (buff[1] << 8) + buff[0];
+//	temp = (float)valore * 0.02 - 273.15;
+//	T_tar = temp;
+//	tempRaw = valore;
+//	ok = 1;
+//}
+//
+///// collega la porta I2C
+//void TEMPER::attachI2C(I2C * p, uint8_t sa){
+//	i2cPtr = p;
+//	i2cPtr->I2CSetSlave_Add(sa);
+//}
+//
+//
+/////////////////////////////////////////////////////////////////////////////
+//
+//
+//COLORE::COLORE(){
+//	 luminanza = 0; bianco = 0; piastra.isDark = ISNT_DARK;
+//}
+//
+//void COLORE::Run(){
+//	uint32_t lum = read();
+//	/// imposta la proprieta' luminanza
+//	set(lum);
+//	if(lum < getWhite() / 4){
+//		piastra.isDark = IS_DARK;
+//	}
+//	else
+//		piastra.isDark = ISNT_DARK;
+//}
