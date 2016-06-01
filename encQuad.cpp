@@ -25,9 +25,10 @@
 #include "uartp/uartstdio.h"
 #include "uartp/uart.h"
 
+
 extern "C" void IntEnc0(void);
 extern "C" void IntGPIOf(void);
-extern encQuad ENC0;
+
 
 void UnlockPD7_01()
 {
@@ -50,7 +51,7 @@ encQuad::encQuad() {
 	indice 		= 0;
 	contIDX 	= 0;
 	posFix 		= 0;
-	setIDX		= FALSE;
+	setIDX		= FALSO;
 
 }
 
@@ -202,6 +203,12 @@ void encQuad::intIDXEnable(){
 	QEIIntEnable(address, QEI_INTINDEX);
 }
 
+///
+/// fissa la posizione per poter essere trasmessa
+void encQuad::fixPos(){
+	pos = QEIPositionGet(address);
+	posFix = pos;
+}
 
 ///
 ///
@@ -211,6 +218,8 @@ void IntEnc0(void){
 	///occorrerebbe contare il numero di IDX
 }
 
+
+extern encQuad ENC0, ENC1;
 ///
 /// interruzione che scatta alla ricezione di IDX
 void IntGPIOf(void){
@@ -222,13 +231,13 @@ void IntGPIOf(void){
 		/// posizione negativa
 		ENC0.pos -= ENC0.fscala;
 	}
-	if (ENC0.setIDX == FALSE){
-		ENC0.setIDX = TRUE;
+	if (ENC0.setIDX == FALSO){
+		ENC0.setIDX = VERO;
 		ENC0.posIDX = ENC0.pos;
 	}
 
 	ENC0.posV[ENC0.indice++] = ENC0.pos;
-	ENC0.indice &= 63;
+	ENC0.indice &= MAX_NUM_PT - 1;
 	if (QEIDirectionGet(QEI0_BASE) == 1)
 		ENC0.contIDX++;
 	else

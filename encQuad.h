@@ -13,8 +13,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define		TRUE	1
-#define		FALSE	0
+#define		VERO		1
+#define		FALSO		0
+#define		MAX_NUM_PT	512
 
 class encQuad {
 public:
@@ -27,7 +28,7 @@ public:
 	void setAddr(uint32_t add){address = add;}
 	void update();
 	void intIDXEnable();
-	void fixPos(){ posFix = pos; }
+	void fixPos();
 
 	/// prorpieta'
 	int 		vel;
@@ -43,7 +44,7 @@ public:
 	uint32_t 	address;
 	/// distanza percorsa in mm
 	int			dist_mm;
-	int 		posV[64];
+	int 		posV[MAX_NUM_PT];
 	int			indice;
 	int			contIDX;
 	int			setIDX;

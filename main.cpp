@@ -48,15 +48,13 @@
 /// variabili globali
 volatile int procCom = 0, tick10, tick100, millis10 = 0;
 volatile int procCom4 = 0;
-volatile int ADCDataReadyFlag = 0;
+
 /// buffer per la seriale che riceve i dati dalla raspPi
 extern volatile uint8_t uart1buffer[DIM_READ_BUFF], RX_PTR1, READ_PTR1;
 extern volatile uint8_t uart0buffer[DIM_READ_BUFF], RX_PTR0, READ_PTR0;
 
 /// MODULI ENCODER ///
 encQuad ENC0, ENC1;
-
-
 
 int main(void) {
 	
@@ -80,19 +78,15 @@ int main(void) {
 	/// descrittore della sintassi dei comandi
 	syn_stat synSTATO;
 	/// modulo zigbee per telemetria
-	//xbee XB;
 	xBee XB;
-
 
 	/// disabilita le interruzioni
 	DI();
 
-	comando CMD1;
+	//comando CMD1;
 
 	/// setup di base
 	setupMCU();
-	/// imposta i parametri del PID
-	//setupPID(CTRL);
 
 	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
 	//setupUART(1);
@@ -122,10 +116,8 @@ int main(void) {
 
 	contatore = 0;
 
-	int tempCont = 0;
-
 	XB.test();
-	int dir = 1, gradi = 0;
+
 	/////////////////////////////////////////////////////////
 	///
 	///      TASK PRINCIPALE
@@ -145,7 +137,25 @@ int main(void) {
 		if (READ_PTR0 != RX_PTR0){
 			 PARSE(&synSTATO);
 			 if(synSTATO.valid == VALIDO){
+				 /// SOLO PER SCOPI DI DEBUG E TARATURA SENSORE
+				 /// per scopi di debug, stama i valori letti ad IDX
+				 if (synSTATO.cmd[0] == 'a'){
+					 /// stampa i valori
+					 PRINTF("ENC0\n");
+					 for (int i = 0; i < (MAX_NUM_PT / 8); i++){
+						 for (int j = 0; j < 8; j++)
+							 PRINTF("%d\t", ENC0.posV[i * 8 + j]);
+						 /// va a capo
+						 PRINTF("\n");
+					 }
+					 PRINTF("****\nFine taratura\n****\n");
+				 }
+				 /// legge la posizione e la fissa in modo da poter essere trasmessa.
 				 ENC0.fixPos();
+				 if (ENC0.posFix > ENC0.fscala / 2){
+					/// posizione negativa
+					ENC0.posFix -= ENC0.fscala;
+				}
 				 /// invia la lettura
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
@@ -260,7 +270,5 @@ uint8_t printFloat(double number, uint8_t digits){
     PRINTF("%d", toPrint);
     remainder -= toPrint;
   }
-
-
   return 0;
 }
