@@ -52,6 +52,7 @@ volatile int procCom4 = 0;
 /// buffer per la seriale che riceve i dati dalla raspPi
 extern volatile uint8_t uart1buffer[DIM_READ_BUFF], RX_PTR1, READ_PTR1;
 extern volatile uint8_t uart0buffer[DIM_READ_BUFF], RX_PTR0, READ_PTR0;
+extern uint8_t releaseHW[], releaseSW[];
 
 /// MODULI ENCODER ///
 encQuad ENC0, ENC1;
@@ -95,7 +96,7 @@ int main(void) {
 	PRINTF("impostata UART0 per debug\n");
 	/// messaggio d'inizio
 	PRINT_WELCOME();
-
+	PRINTF("%s", releaseSW);
 
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms

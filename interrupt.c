@@ -22,7 +22,8 @@
 #include "uartp/uart.h"
 #include "init.h"
 
-
+const uint8_t releaseHW[] = {"1.0.1\0"};
+const uint8_t releaseSW[] = {"1.0.1\0"};
 ///
 /// routine di servizio della uart1 (usata per comunicare con la tiva)
 volatile uint8_t uart1buffer[], RX_PTR1 = 0, READ_PTR1 = 0;
