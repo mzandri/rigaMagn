@@ -157,32 +157,31 @@ int main(void) {
 					/// posizione negativa
 					ENC0.posFix -= ENC0.fscala;
 				}
+				 char buffer[4];
 				 /// invia la lettura
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
-					 volatile uint8_t valore;
-					 valore = (ENC0.posFix >> (8 * i)) & 0xff;
-					 PRINTF ("%d", valore);
+
+					 buffer[i] = (ENC0.posFix >> (8 * i)) & 0xff;
+					 ////PRINTF ("%d", valore);
+					 /// al posto di PRINTF() si invia il carattere direttamente
 				 }
-				 /// spaziatura
-				 PRINTF("\n");
-				 PRINTF("%d\t%d(%d)\n", ENC0.posFix, ENC0.contIDX, ENC0.posIDX);
+				 UARTwrite(buffer, 4);
+
+				 //PRINTF("%d\t%d(%d)\n", ENC0.posFix, ENC0.contIDX, ENC0.posIDX);
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
-					 volatile uint8_t valore;
-					 valore = (ENC0.posV[i] >> (8 * i)) & 0xff;
-					 PRINTF ("%d", valore);
+					 buffer[i] = (ENC0.posV[i] >> (8 * i)) & 0xff;
 				 }
-				 /// spaziatura
-				 PRINTF("\n");
+				 UARTwrite(buffer, 4);
+
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
-					 volatile uint8_t valore;
-					 valore = (ENC0.posV[i + 8] >> (8 * i)) & 0xff;
+
+					 buffer[i] = (ENC0.posV[i + 8] >> (8 * i)) & 0xff;
  					 PRINTF ("%d", valore);
 				 }
-				 /// spaziatura
-				 PRINTF("\n");
+				 UARTwrite(buffer, 4);
 
 				 synSTATO.valid = NON_VALIDO;
 			 }
