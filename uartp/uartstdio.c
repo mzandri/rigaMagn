@@ -520,10 +520,11 @@ UARTwrite(const char *pcBuf, uint32_t ui32Len)
         // If the character to the UART is \n, then add a \r before it so that
         // \n is translated to \n\r in the output.
         //
-        if(pcBuf[uIdx] == '\n')
-        {
-            MAP_UARTCharPut(g_ui32Base, '\r');
-        }
+    	// NELLE APPLICAZIONI RAW QUESTA CARATTERISTICA VA TOLTA
+//        if(pcBuf[uIdx] == '\n')
+//        {
+//            MAP_UARTCharPut(g_ui32Base, '\r');
+//        }
 
         //
         // Send the character to the UART output.

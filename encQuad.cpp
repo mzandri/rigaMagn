@@ -44,7 +44,7 @@ void UnlockPD7_01()
 encQuad::encQuad() {
 	// TODO Auto-generated constructor stub
 	address 	= 0;
-	fscala 		= 40000;
+	fscala 		= 200000;
 	zero_pos 	= 0;
 	vel_period = ROM_SysCtlClockGet()/10;
 	vel 		= 0;

@@ -30,6 +30,7 @@
 #include "inc/hw_types.h"
 #include "inc/hw_gpio.h"
 #include "driverlib/i2c.h"
+#include "I2C/tiva_i2c.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
@@ -127,6 +128,8 @@ int main(void) {
 //	setupUART(1);
 //	XB.sendString("Ciao\n", 5);
 	PRINTF("Telemetria\n");
+	/// spegne il led rosso.
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, 0);
 	while(1){
 
 
@@ -171,15 +174,15 @@ int main(void) {
 				 //PRINTF("%d\t%d(%d)\n", ENC0.posFix, ENC0.contIDX, ENC0.posIDX);
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
-					 buffer[i] = (ENC0.posV[i] >> (8 * i)) & 0xff;
+					 buffer[i] = ((ENC0.posFix + 35) >> (8 * i)) & 0xff;
 				 }
 				 UARTwrite(buffer, 4);
 
 				 for(int i = 0; i < 4; i++){
 					 /// invio dei 4 byte dell'intero little endian
 
-					 buffer[i] = (ENC0.posV[i + 8] >> (8 * i)) & 0xff;
- 					 PRINTF ("%d", valore);
+					 buffer[i] = ((ENC0.posFix + 125) >> (8 * i)) & 0xff;
+ 					 //PRINTF ("%d", valore);
 				 }
 				 UARTwrite(buffer, 4);
 

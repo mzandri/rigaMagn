@@ -201,9 +201,10 @@ void setupMCU(void){
 	/// attesa per l'attuazione delle impostazioni
 	valore = 10;
 	while(--valore);
-	while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
-
+	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
+	/// accende il led rosso
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, RED_LED);
 
 
 	//setup PB0 per scopi di debug
