@@ -1,4 +1,4 @@
 # rigaMagn
 counts pulses of a quadrature magnetic encoder
 
-doc/index.md
+https://github.com/mzandri/rigaMagn/blob/master/doc/index.md
